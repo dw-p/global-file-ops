@@ -41,6 +41,32 @@ def dwhash_file(in_file):
 
     return hasher.hexdigest()
 
+def generic_walk_with_path(path):
+    if(os.path.isfile(path)):
+        return [(dwhash_file(path),path)]
+    elif(os.path.isdir(path)):
+        items = [os.path.join(path,i) for i in os.listdir(path)]
+        one_list=[]
+        it=map(generic_walk,items) # items are now all lists. collect lists into one
+        print(list(it))
+        for i in it:
+            one_list.extend(i)
+
+        one_list.sort()
+        s = ""
+        for i in one_list:
+            s = s+i[0]
+
+        hasher = hashlib.sha512()
+        hasher.update(s.encode('utf-8'))
+        one_list.append((hasher.hexdigest(),path))
+
+        return one_list
+    else:
+        raise ValueError
+
+
+
 def generic_walk(path):
     if(os.path.isfile(path)):
         return [dwhash_file(path)]
